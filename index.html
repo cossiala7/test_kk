@@ -100,7 +100,7 @@ async function run() {
   statusEl.textContent = "Envoi de l'info par e-mail...";
 
   try {
-    const res = await fetch("https://TON-BACKEND.exemple.com/notify", {
+    const res = await fetch("https://dakar-shop-back.onrender.com", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
