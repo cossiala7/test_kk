@@ -27,7 +27,7 @@ app = FastAPI()
 # Autoriser les requêtes depuis ta page HTML (ajuste l'origine en prod)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # remplace par ton domaine en prod, ex: ["https://tonsite.com"]
+    allow_origins=["https://dakar-shop.onrender.com"],  # remplace par ton domaine en prod, ex: ["https://tonsite.com"]
     allow_methods=["POST"],
     allow_headers=["*"],
 )
