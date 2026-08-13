@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Devine ton téléphone 📱</title>
+<style>
+  body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background: linear-gradient(135deg, #6a5af9, #a45cff);
+    color: white;
+    min-height: 100vh;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  .card {
+    background: rgba(255,255,255,0.12);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 32px 24px;
+    max-width: 420px;
+    width: 100%;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  }
+  h1 { font-size: 1.4rem; margin-bottom: 8px; }
+  .result {
+    font-size: 1.1rem;
+    margin: 20px 0;
+    line-height: 1.6;
+  }
+  .result b { font-size: 1.3rem; display: block; margin-top: 4px; }
+  .notice {
+    font-size: 0.85rem;
+    opacity: 0.9;
+    margin-top: 20px;
+    padding: 12px;
+    background: rgba(0,0,0,0.15);
+    border-radius: 10px;
+  }
+  .status {
+    margin-top: 12px;
+    font-size: 0.85rem;
+    opacity: 0.8;
+  }
+  .emoji { font-size: 2.5rem; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="emoji" id="emoji">🔍</div>
+    <h1>Détection de ton téléphone...</h1>
+    <div class="result" id="result">Analyse en cours...</div>
+
+    <div class="notice">
+      ⚠️ Cette page détecte la marque/le modèle de ton appareil (info technique, non personnelle) et l'envoie par e-mail à la personne qui t'a envoyé ce lien.
+    </div>
+    <div class="status" id="status"></div>
+  </div>
+
+<script>
+function detectDevice() {
+  const ua = navigator.userAgent;
+  let brand = "Inconnu";
+  let os = "Inconnu";
+  let emoji = "📱";
+
+  if (/iPhone/i.test(ua)) { brand = "Apple iPhone"; os = "iOS"; emoji = "🍎"; }
+  else if (/iPad/i.test(ua)) { brand = "Apple iPad"; os = "iOS"; emoji = "🍎"; }
+  else if (/Macintosh/i.test(ua)) { brand = "Apple Mac"; os = "macOS"; emoji = "💻"; }
+  else if (/Samsung|SM-/i.test(ua)) { brand = "Samsung Galaxy"; os = "Android"; emoji = "📱"; }
+  else if (/Pixel/i.test(ua)) { brand = "Google Pixel"; os = "Android"; emoji = "📱"; }
+  else if (/Xiaomi|Redmi|POCO/i.test(ua)) { brand = "Xiaomi"; os = "Android"; emoji = "📱"; }
+  else if (/Huawei/i.test(ua)) { brand = "Huawei"; os = "Android"; emoji = "📱"; }
+  else if (/OnePlus/i.test(ua)) { brand = "OnePlus"; os = "Android"; emoji = "📱"; }
+  else if (/Android/i.test(ua)) { brand = "Android (marque non précisée)"; os = "Android"; emoji = "🤖"; }
+  else if (/Windows/i.test(ua)) { brand = "PC Windows"; os = "Windows"; emoji = "💻"; }
+  else if (/Linux/i.test(ua)) { brand = "PC Linux"; os = "Linux"; emoji = "💻"; }
+
+  let browser = "Inconnu";
+  if (/Chrome/i.test(ua) && !/Edg/i.test(ua)) browser = "Chrome";
+  else if (/Safari/i.test(ua) && !/Chrome/i.test(ua)) browser = "Safari";
+  else if (/Firefox/i.test(ua)) browser = "Firefox";
+  else if (/Edg/i.test(ua)) browser = "Edge";
+
+  return { brand, os, browser, emoji, ua };
+}
+
+async function run() {
+  const info = detectDevice();
+  document.getElementById('emoji').textContent = info.emoji;
+  document.getElementById('result').innerHTML =
+    `Ton appareil : <b>${info.brand}</b><br>Système : ${info.os}<br>Navigateur : ${info.browser}`;
+
+  const statusEl = document.getElementById('status');
+  statusEl.textContent = "Envoi de l'info par e-mail...";
+
+  try {
+    const res = await fetch("https://TON-BACKEND.exemple.com/notify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        brand: info.brand,
+        os: info.os,
+        browser: info.browser,
+        time: new Date().toLocaleString("fr-FR")
+      })
+    });
+    if (res.ok) {
+      statusEl.textContent = "✅ E-mail envoyé.";
+    } else {
+      statusEl.textContent = "⚠️ Envoi impossible pour le moment.";
+    }
+  } catch (e) {
+    statusEl.textContent = "⚠️ Envoi impossible (backend non configuré).";
+  }
+}
+
+run();
+</script>
+</body>
+</html>
